@@ -76,7 +76,7 @@ void main()
     //    cout << "Error number day!" << endl;
     //}
 
-    //2 switch
+    //2 swіtch
     //int day;
     //cout << "Enter day number : ";
     //cin >> day;
