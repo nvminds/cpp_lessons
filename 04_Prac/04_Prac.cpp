@@ -25,7 +25,6 @@ int main()
    /* int N=0;
     int i=0;
     int repeats=0;
-    int counter = 0;
     int summ = 0;
     cout << "Enter count of numbers : ";
     cin >> repeats;
