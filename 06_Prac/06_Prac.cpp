@@ -3,7 +3,7 @@ using namespace std;
 
 int main()
 {
-    ////1
+    //1
     //const int size = 10;
     //int arr[size];
     //int dob = 1;

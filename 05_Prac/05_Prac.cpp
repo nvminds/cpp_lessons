@@ -9,7 +9,7 @@ int main()
 	{
 		for (int j = 0; j < 12; j++)
 		{
-			if (i==j or i<j){
+			if (i==j ){
 				
 				cout << "::";
 			}
