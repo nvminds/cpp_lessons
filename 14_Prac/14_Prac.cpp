@@ -26,7 +26,7 @@ void fillOneRow(int* arr, int col)
 {
     for (int i = 0; i < col; i++)
     {
-        arr[i] = rand() % 10;
+        arr[i] = rand() %10;
     }
 }
 int** addRowInStart(int** arr, int& row, int col)

@@ -116,7 +116,7 @@ int main()
 {
     srand(time(0));
     //int* arr = new int[8];
-    //delete[]arr;
+    //delete[]arr; 
 
     int rows = 3;
     int cols = 4;
