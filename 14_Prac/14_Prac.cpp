@@ -203,7 +203,6 @@ int main()
     cout << "Matrix with deleted column by position : " << endl;
     showMatrix(arr, rows, cols);
 
-
     for (int i = 0; i < rows; i++)
     {
         delete[]arr[i];
