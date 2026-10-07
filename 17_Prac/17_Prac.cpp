@@ -1,7 +1,9 @@
 ﻿#include <iostream>
+#include <fstream>
 #include <conio.h>
 using namespace std;
 
+const char* filename = "BooksDatabase.txt";
 struct Book
 {
     char name[30];
@@ -10,6 +12,32 @@ struct Book
     char genre[30];
     char year_of_publication[30];
     float price;
+    void saveToFile()
+    {
+        ofstream out(filename, ios_base::app);
+        out << name;
+        out << ':';
+        out << author;
+        out << ':';
+        out << publication;
+        out << ':';
+        out << genre;
+        out << ':';
+        out << year_of_publication;
+        out << ':';
+        out << price;
+        out << '|';
+        out.close();
+    }
+    void copyFromFile(char* nameF, char* authorF, char* publicationF, char* genreF, char* year_of_publicationF, float priceF)
+    {
+        strcpy_s(name, nameF);
+        strcpy_s(author, authorF);
+        strcpy_s(publication, publicationF);
+        strcpy_s(genre, genreF);
+        strcpy_s(year_of_publication, year_of_publicationF);
+        price = priceF;
+    }
 };
 void showAllBooks(Book &books)
 {
@@ -81,13 +109,14 @@ Book* addNewBook(Book* books, int* size, Book newBook)
         temp[i] = books[i];
     }
     temp[*size] = newBook;
+    temp[*size].saveToFile();
     delete[]books;
     (*size)++;
     return temp;
 }
 Book* removeBookByName(Book* books, int* size, char name[])
 {
-    int index = 0;
+    int index = -1;
     for (int i = 0; i < *size; i++)
     {
         if (strcmp(books[i].name, name) == 0)
@@ -95,26 +124,86 @@ Book* removeBookByName(Book* books, int* size, char name[])
             index = i;
         }
     }
-    Book* temp = new Book[*size - 1];
-    for (int i = 0; i < index; i++)
+    if (index!=-1)
     {
-        temp[i] = books[i];
+        Book* temp = new Book[*size - 1];
+        for (int i = 0; i < index; i++)
+        {
+            temp[i] = books[i];
+        }
+        for (int i = index + 1; i < *size; i++)
+        {
+            temp[i - 1] = books[i];
+        }
+        delete[]books;
+        (*size)--;
+        return temp;
     }
-    for (int i = index + 1; i < *size; i++)
+    else 
     {
-        temp[i - 1] = books[i];
+        return books;
     }
-    delete[]books;
-    (*size)--;
-    return temp;
 }
+void readFromFile(Book*& arr, int& size)
+{
+    ifstream in(filename, ios_base::in);
+    char Bname[30], Bauthor[30], Bpublication[30], Bgenre[30], Byear_of_publication[30], Bprice[30];
+    while (!in.eof())
+    {
+        in.getline(Bname, 30, ':');
+        if (in.eof())
+        {
+            break;
+        }
+        in.getline(Bauthor, 30, ':');
+        in.getline(Bpublication, 30, ':');
+        in.getline(Bgenre, 30, ':');
+        in.getline(Byear_of_publication, 30, ':');
+        in.getline(Bprice, 30, '|');
 
+        float price = atof(Bprice);
+
+        Book readBook;
+        readBook.copyFromFile(Bname, Bauthor, Bpublication, Bgenre, Byear_of_publication, price);
+
+        Book* temp = new Book[size + 1];
+        for (int i = 0; i < size; i++)
+        {
+            temp[i] = arr[i];
+        }
+        temp[size] = readBook;
+        delete[]arr;
+        size++;
+        arr = temp;
+    }
+}
+void changeFileInfo(Book* books, int& size)
+{
+    ofstream out(filename, ios_base::out);
+    for (int i = 0; i < size; i++)
+    {
+        out << books[i].name;
+        out << ':';
+        out << books[i].author;
+        out << ':';
+        out << books[i].publication;
+        out << ':';
+        out << books[i].genre;
+        out << ':';
+        out << books[i].year_of_publication;
+        out << ':';
+        out << books[i].price;
+        out << '|';
+    }
+    out.close();
+}
 
 int main()
 {
     int choice;
     char name[30], author[30], genre[30], publication[30];
-    int* size = new int(10);
+    //int* size = new int(10);
+    int* size = new int(0);
     Book* books = new Book[*size];
     Book default_books[10] =
     {
@@ -125,14 +214,19 @@ int main()
         {"Sherlock Holmes", "Arthur Conan Doyle", "George Newnes", "Detective", "1892", 195.00},
         {"Dracula", "Bram Stoker", "Archibald Constable", "Horror", "1897", 210.00},
         {"Clean Code", "Robert C. Martin", "Prentice Hall", "Technical", "2008", 850.00},
-        {"The Little Prince", "Antoine de Saint-Exupéry", "Reynal & Hitchcock", "Fable", "1943", 135.20},
+        {"The Little Prince", "Antoine de Saint-Exupery", "Reynal & Hitchcock", "Fable", "1943", 135.20},
         {"Dune", "Frank Herbert", "Chilton Books", "Sci-Fi", "1965", 410.00},
         {"The Great Gatsby", "F. Scott Fitzgerald", "Charles Scribner's", "Classic", "1925", 180.00}
     };
-    for (int i = 0; i < *size; i++)
-    {
-        books[i] = default_books[i];
-    }
+    //for (int i = 0; i < *size; i++)
+    //{
+    //    books[i] = default_books[i];
+    //}
+    //for (int i = 0; i < *size; i++)
+    //{
+    //    books[i].saveToFile();
+    //}
+    readFromFile(books, *size);
     do 
     {
         system("cls");
@@ -160,24 +254,25 @@ int main()
             }
             break;
         case 2:
-            cout << "Enter book name >> "; cin.getline(name, 50); cout << endl;
+            cout << "Enter book name >> "; cin.getline(name, 30); cout << endl;
             searchByName(name, books, *size);
             break;
         case 3:
-            cout << "Enter book author >> "; cin.getline(author, 50); cout << endl;
+            cout << "Enter book author >> "; cin.getline(author, 30); cout << endl;
             searchByAuthor(author, books, *size);
             break;
         case 4:
-            cout << "Enter book genre >> "; cin.getline(genre, 50); cout << endl;
+            cout << "Enter book genre >> "; cin.getline(genre, 30); cout << endl;
             searchByGenre(genre, books, *size);
             break;
         case 5:
-            cout << "Enter book publication >> "; cin.getline(publication, 50); cout << endl;
+            cout << "Enter book publication >> "; cin.getline(publication, 30); cout << endl;
             searchByPublication(publication, books, *size);
             break;
         case 6:
-            cout << "Enter book name >> "; cin.getline(name, 50); cout << endl;
+            cout << "Enter book name >> "; cin.getline(name, 30); cout << endl;
             changeBookPrice(books, *size, name);
+            changeFileInfo(books, *size);
             break;
         case 7:
         {
@@ -197,8 +292,9 @@ int main()
             break;
         }
         case 8:
-            cout << "Enter book name to delete >> "; cin.getline(name, 50); cout << endl;
+            cout << "Enter book name to delete >> "; cin.getline(name, 30); cout << endl;
             books = removeBookByName(books, size, name);
+            changeFileInfo(books, *size);
             for (int i = 0; i < *size; i++)
             {
                 showAllBooks(books[i]);
